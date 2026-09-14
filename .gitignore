@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+
+# Build & Output
+dist/
+build/
+/generated/prisma
+
+# Environment Files
+.env
+.env.*
+!.env.example
+*.env
+
+# IDE & AI Agent Configurations
+.agents/
+.claude/
+.windsurf/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs & Temporary Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+tmp/
+
+# Documentation & Non-Code Files
+*.pdf
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Skill Locks
+skills-lock.json
