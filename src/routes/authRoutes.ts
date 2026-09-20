@@ -9,7 +9,6 @@ const router = Router();
 
 // Public: Restaurant Self-Registration
 router.post("/register-restaurant", validate({ body: registerRestaurantSchema }), registerRestaurant);
-
 // Public: Login (Super Admin, Restaurant Admin, Staff)
 router.post("/login", validate({ body: loginSchema }), loginStaff);
 

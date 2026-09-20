@@ -155,6 +155,7 @@ model MenuItem {
   category    MenuCategory @relation(fields: [categoryId], references: [id])
 
   orderItems  OrderItem[]
+  cartItems   SessionCartItem[]
 
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
@@ -169,10 +170,28 @@ model TableSession {
 
   orders         Order[]
   bills          Bill[]
+  cartItems      SessionCartItem[]
 
   startedAt      DateTime      @default(now())
   lastActivityAt DateTime      @default(now())
   endedAt        DateTime?
+}
+
+model SessionCartItem {
+  id             String       @id @default(uuid())
+  tableSessionId String
+  tableSession   TableSession @relation(fields: [tableSessionId], references: [id])
+
+  menuItemId     String
+  menuItem       MenuItem     @relation(fields: [menuItemId], references: [id])
+
+  quantity       Int          @default(1)
+  notes          String?
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([tableSessionId, menuItemId])
 }
 
 model Order {

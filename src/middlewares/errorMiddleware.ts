@@ -55,6 +55,7 @@ export const globalErrorHandler = (
   res.status(statusCode).json({
     success: false,
     message,
+    ...(error.code && { error: error.code }),
     ...(CONFIG.NODE_ENV === "development" && { stack: err.stack }),
   });
 };

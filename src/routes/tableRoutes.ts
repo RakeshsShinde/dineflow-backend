@@ -17,9 +17,14 @@ const router = Router();
 
 router.use(authenticateStaff);
 
-router.get("/", authorizeRoles([UserRole.ADMIN, UserRole.WAITER]), getTables);
+router.get("/", authorizeRoles([UserRole.ADMIN, UserRole.WAITER, UserRole.KITCHEN]), getTables);
 
-router.get("/:id", authorizeRoles([UserRole.ADMIN, UserRole.WAITER]), validate({ params: tableIdParamSchema }), getTableById);
+router.get(
+  "/:id",
+  authorizeRoles([UserRole.ADMIN, UserRole.WAITER, UserRole.KITCHEN]),
+  validate({ params: tableIdParamSchema }),
+  getTableById
+);
 
 router.post("/", authorizeRoles([UserRole.ADMIN]), validate({ body: createTableSchema }), createTable);
 

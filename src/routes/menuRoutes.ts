@@ -25,13 +25,16 @@ import { UserRole } from "@prisma/client";
 
 const router = Router();
 
-router.get("/categories", authenticateStaff, getCategories);
+// Public: customers browse the categorized menu after scanning a table's QR code
+// (restaurantId comes from the query string); staff/admin get the same handler to
+// see their own restaurant's menu, resolved from the JWT instead.
+router.get("/categories", getCategories);
 router.get("/items", getMenuItems);
 
 router.post(
   "/admin/categories",
   authenticateStaff,
-  authorizeRoles([UserRole.ADMIN]),
+  authorizeRoles([UserRole.ADMIN, UserRole.WAITER]),
   validate({ body: createCategorySchema }),
   createCategory
 );
@@ -56,7 +59,7 @@ router.delete(
 router.post(
   "/admin/items",
   authenticateStaff,
-  authorizeRoles([UserRole.ADMIN]),
+  authorizeRoles([UserRole.ADMIN, UserRole.WAITER]),
   validate({ body: createMenuItemSchema }),
   createMenuItem
 );

@@ -21,7 +21,10 @@ export const validate = (schemas: ValidationSchemas) => {
         req.body = await schemas.body.parseAsync(req.body);
       }
       if (schemas.query) {
-        req.query = (await schemas.query.parseAsync(req.query)) as any;
+        // Express 5 makes `req.query` a getter with no setter, so it can't be
+        // reassigned — mutate the object it returns in place instead.
+        const parsedQuery = await schemas.query.parseAsync(req.query);
+        Object.assign(req.query as Record<string, unknown>, parsedQuery);
       }
       if (schemas.params) {
         req.params = (await schemas.params.parseAsync(req.params)) as any;

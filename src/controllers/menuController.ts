@@ -42,7 +42,7 @@ export const createCategory = catchAsync(async (req: AuthenticatedRequest, res: 
   const restaurantId = req.user?.restaurantId;
 
   if (!restaurantId) {
-    throw new AppError("Admin is not associated with a restaurant", 403);
+    throw new AppError("Your account isn't associated with a restaurant", 403);
   }
 
   const category = await prisma.menuCategory.create({

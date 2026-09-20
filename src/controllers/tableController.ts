@@ -13,7 +13,6 @@ export const createTable = catchAsync(async (req: AuthenticatedRequest, res: Res
   const { tableNumber } = req.body;
   const rawRestaurantId = req.user?.restaurantId || req.body.restaurantId;
   const restaurantId = rawRestaurantId ? String(rawRestaurantId) : null;
-  console.log("restaurantId", restaurantId)
 
   if (!restaurantId) {
     throw new AppError("restaurantId is required to create a table", 400);

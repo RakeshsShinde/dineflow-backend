@@ -102,30 +102,42 @@ export const joinSession = catchAsync(async (req: Request, res: Response): Promi
     },
   });
 
-  console.log("active session", activeSession)
-
-  // 4. If no active session exists, create a new session & set table status to OCCUPIED
+  // 4. If no active session exists, create a new session & set table status to OCCUPIED.
+  // A DB-level partial unique index (one ACTIVE TableSession per tableId) is the real
+  // guard here — two concurrent requests can both reach this branch (the findFirst
+  // above is a fast path, not a lock), so the loser's INSERT is rejected by Postgres.
+  // When that happens, just read back the session the winner created instead of erroring.
   if (!activeSession) {
     const sessionTokenString = generateSessionToken(table.id);
 
-    activeSession = await prisma.$transaction(async (tx) => {
-      // Create session
-      const newSession = await tx.tableSession.create({
-        data: {
-          tableId: table.id,
-          sessionToken: sessionTokenString,
-          status: SessionStatus.ACTIVE,
-        },
-      });
+    try {
+      activeSession = await prisma.$transaction(async (tx) => {
+        const newSession = await tx.tableSession.create({
+          data: {
+            tableId: table.id,
+            sessionToken: sessionTokenString,
+            status: SessionStatus.ACTIVE,
+          },
+        });
 
-      // Update table status to OCCUPIED
-      await tx.table.update({
-        where: { id: table.id },
-        data: { status: TableStatus.OCCUPIED },
-      });
+        await tx.table.update({
+          where: { id: table.id },
+          data: { status: TableStatus.OCCUPIED },
+        });
 
-      return newSession;
-    });
+        return newSession;
+      });
+    } catch (error: any) {
+      const isUniqueViolation =
+        error?.code === "P2002" || error?.code === "23505" || error?.cause?.code === "23505";
+      if (!isUniqueViolation) throw error;
+
+      const winner = await prisma.tableSession.findFirst({
+        where: { tableId: table.id, status: SessionStatus.ACTIVE },
+      });
+      if (!winner) throw error;
+      activeSession = winner;
+    }
   }
 
   res.status(200).json({

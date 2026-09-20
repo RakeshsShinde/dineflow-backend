@@ -7,9 +7,7 @@ import { catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/AppError";
 import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 
-/**
- * Public Endpoint: Self-register a new Restaurant + Restaurant Admin Account
- */
+
 export const registerRestaurant = catchAsync(async (req: Request, res: Response): Promise<void> => {
   const { name, address, gstNumber, adminName, adminEmail, adminPassword } = req.body;
 

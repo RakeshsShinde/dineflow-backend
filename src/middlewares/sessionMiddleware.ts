@@ -42,9 +42,12 @@ export const validateTableSession = async (
     }
 
     if (session.status !== SessionStatus.ACTIVE) {
+      const isClosed = session.status === SessionStatus.CLOSED;
       res.status(409).json({
-        error: "TABLE_IN_BILLING",
-        message: `Table session is currently ${session.status.toLowerCase()}. Further ordering is locked.`,
+        error: isClosed ? "SESSION_CLOSED" : "SESSION_BILLING",
+        message: isClosed
+          ? "This table session has ended. Scan the table's QR code again to start a new order."
+          : `Table session is currently ${session.status.toLowerCase()}. Further ordering is locked.`,
       });
       return;
     }
